@@ -1,0 +1,47 @@
+name:                l19
+version:             0.0.0.1
+synopsis:            L19 Compiler
+description:         L19 Compiler
+homepage:            https://github.com/pearisgreen/l19_lang
+license:             GNU
+license-file:        LICENSE
+author:              Gerrit Proessl
+maintainer:          gerrit.proessl@gmail.com
+copyright:           2019 Gerrit Proessl
+Category:            Compilers
+build-type:          Simple
+cabal-version:       >=1.10
+Bug-Reports:         https://github.com/pearisgreen/l19/issues
+
+Source-Repository head
+    Type: git
+    Location: git@github.com:pearisgreen/l19_lang.git
+
+executable comp
+  default-language:    Haskell2010
+  main-is:             Main.hs
+  other-modules: 
+    Parser
+    Syntax
+    Lexer
+  build-depends:
+      base                 >= 4.7 && <5
+    , haskeline            >= 0.7.1.2
+    , llvm-hs              >= 4.0.0.0
+    , llvm-hs-pure         >= 4.0.0.0
+    , parsec               >= 3.1
+    , mtl                  >= 2.1.3
+    , transformers         >= 0.3.0.0 && < 0.6
+  hs-source-dirs:      src
+
+
+
+library
+  default-language:    Haskell2010
+  build-depends:
+      base                 >= 4.7 && <5
+    , haskeline            >= 0.7.1.2
+    , llvm-hs              >= 4.0.0.0
+    , llvm-hs-pure         >= 4.0.0.0
+    , mtl                  >= 2.1.3
+    , transformers         >= 0.3.0.0 && < 0.6

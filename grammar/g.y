@@ -1,5 +1,8 @@
 %token ID
 %token IF
+%token BRK
+%token CON
+%token RET
 %token WHILE
 %token ELIF
 %token ELSE
@@ -80,6 +83,7 @@ type                  : '*' type
                       | F32
                       | F64
                       | VOID
+                      | ID
 ;
 
 //---------------------------------------
@@ -93,7 +97,10 @@ statement_lst_opt     : '{'
                       | statement_lst_opt statement
 ;
 
-statement             : var_stm
+statement             : ret_stm
+                      | brk_stm
+                      | con_stm
+                      | var_stm
                       | conditional_stm
                       | loop_stm
                       | exp
@@ -113,14 +120,42 @@ conditional_stm_opt   : IF exp statement_lst
 loop_stm              : WHILE exp statement_lst
 ;
 
+ret_stm               : RET '(' exp ')'
+                      | RET
+;
+
+brk_stm               : BRK
+;
+
+con_stm               : CON
+;
+
 //---------------------------------------
 // EXPRESSION
 //---------------------------------------
 
 exp                   : INTEGER
                       | FLOAT
-                      | ID '.' exp
+                      | access_exp
+                      | call_exp
                       | ID
                       | '&' exp
                       | '*' exp
+                      | cast_exp
+;
+
+access_exp            : ID '.' ID
+                      | ID '-' '>' ID
+                      | access_exp '.' ID
+                      | access_exp '-' '>' ID
+;
+
+cast_exp              : '<' type '>' exp
+;
+
+call_exp              : call_exp_opt ')'
+;
+
+call_exp_opt          : ID '('
+                      | call_exp_opt exp 
 ;
