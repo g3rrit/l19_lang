@@ -1,6 +1,6 @@
 module Syntax where
 
-import Data.Maby
+import Data.Maybe
 
 data Definition
   = Struct_Def Struct
@@ -8,13 +8,13 @@ data Definition
   deriving (Show)
 
 data Struct = Struct {
-  id  :: String,
+  sid :: String,
   mem :: [Var]}
   deriving (Show)
 
 data Function = Function {
-  id   :: String,
-  t    :: PType,
+  fid  :: String,
+  rt   :: PType,
   args :: [Var],
   body :: [Stm]}
   deriving (Show)
@@ -41,11 +41,11 @@ data PType
   deriving (Show)
 
 data Stm
-  = Ret_Stm (Maby Exp)
+  = Ret_Stm (Maybe Exp)
   | Brk_Stm
   | Con_Stm
   | Var_Stm Var
-  | Conditional_Stm (Maby Exp) [Stm] (Maby Stm)
+  | Conditional_Stm (Maybe Exp) [Stm] (Maybe Stm)
   | Loop_Stm Exp [Stm]
   deriving (Show)
 
@@ -58,7 +58,4 @@ data Exp
   | Id_Exp String
   | Ref_Exp Exp
   | Deref_Exp Exp
-  deriving (Show)
-
-data Var = Var String PType
   deriving (Show)
