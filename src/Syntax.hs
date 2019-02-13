@@ -38,6 +38,9 @@ data PType
   | F64
   | VOID
   | Id_Type String
+  | Function_Type {
+    fargs :: [PType],
+    frt   :: PType}
   deriving (Show)
 
 data Stm
@@ -50,8 +53,8 @@ data Stm
   deriving (Show)
 
 data Exp
-  = Integer Int
-  | Float Double
+  = Integer_L Integer
+  | Float_L Double
   | Acc_Dot_Exp Exp Exp
   | Acc_Arr_Exp Exp Exp
   | Cast_Exp PType Exp

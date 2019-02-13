@@ -1,7 +1,9 @@
 module Lexer where
 
+import Text.Parsec
 import Text.Parsec.String (Parser)
 import Text.Parsec.Language (emptyDef)
+import Text.Parsec.Char (oneOf, letter, alphaNum)
 
 import qualified Text.Parsec.Token as Tok
 
@@ -12,12 +14,11 @@ lexer = Tok.makeTokenParser style
     names = [ "if", "el", "brk", "con", "while",
               "void", "u8", "i8", "u16", "i16", "u32", "i32",
               "u64", "i64", "f32", "f64", "ret"]
-    special_id = oneOf "_+-?!"
     style = emptyDef {
         Tok.commentStart = "/*"
       , Tok.commentEnd = "*/"
-      , Tok.identStart = letter <|> special_id
-      , Tok.identLetter = alphaNum <|> special_id
+      , Tok.identStart = letter <|> oneOf "_+-?!"
+      , Tok.identLetter = alphaNum <|> oneOf "_+-?!"
       , Tok.commentLine = "//"
       , Tok.reservedOpNames = ops
       , Tok.reservedNames = names

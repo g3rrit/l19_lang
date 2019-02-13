@@ -13,9 +13,9 @@ process input = do
     Right re -> mapM_ print re
 
 main :: IO ()
-main = runIputT defaultSetting loop
+main = runInputT defaultSettings loop
   where loop = do
-          minput <- getINputLine "ready>"
+          minput <- getInputLine "ready>"
           case minput of
             Nothing -> outputStrLn "End."
             Just input -> (liftIO $ process input) >> loop

@@ -27,8 +27,8 @@ parse_prog s = parse (contents prog) "<error>" s
 ---------------------------------------
 
 definition :: Parser Definition
-definition = struct_def
-         <|> function_def
+definition = try struct_def
+         <|> try function_def
 
 struct_def :: Parser Definition
 struct_def = do
@@ -38,7 +38,7 @@ struct_def = do
 function_def :: Parser Definition
 function_def = do
   f <- function
-  return $ Function_Def
+  return $ Function_Def f
 
 ---------------------------------------
 -- STRUCT
@@ -58,7 +58,7 @@ function :: Parser Function
 function = do
   id <- identifier
   args <- parens $ comma var
-  reserved_op ":"
+  reserved_op "->"
   t <- ptype
   body <-  braces $ many stm
   return $ Function id t args body
@@ -101,7 +101,15 @@ ptype = pointer_type
     <|> do
            i <- identifier
            return $ Id_Type i
+    <|> do args <- parens $ many ptype
+           reserved_op "->"
+           rt   <- ptype
+           return $ Function_Type args rt
 
+pointer_type :: Parser PType
+pointer_type = do reserved_op "*"
+                  p <- ptype
+                  return $ Pointer p
 ---------------------------------------
 -- STATEMENT
 ---------------------------------------
@@ -117,7 +125,7 @@ stm = ret_stm
 ret_stm :: Parser Stm
 ret_stm = do
   reserved "ret"
-  r <- parens $ optionMaby exp
+  r <- parens $ optionMaybe uexp
   return $ Ret_Stm r
 
 brk_stm :: Parser Stm
@@ -133,24 +141,24 @@ con_stm = do
 loop_stm :: Parser Stm
 loop_stm = do
   reserved "while"
-  con  <- exp
+  con  <- uexp
   body <- braces $ many stm
   return $ Loop_Stm con body
 
 conditional_stm :: Parser Stm
 conditional_stm = do
   reserved "if"
-  con  <- exp
+  con  <- uexp
   body <- braces $ many stm
-  next <- optionMaby conditional_stm_opt
+  next <- optionMaybe conditional_stm_opt
   return $ Conditional_Stm (Just con) body next
 
 conditional_stm_opt :: Parser Stm
 conditional_stm_opt = do
   reserved "el"
-  con  <- optionMaby exp
+  con  <- optionMaybe uexp
   body <- braces $ many stm
-  next <- optionMaby conditional_stm_opt
+  next <- optionMaybe conditional_stm_opt
   return $ Conditional_Stm con body next
 
 var_stm :: Parser Stm
@@ -162,8 +170,8 @@ var_stm = do
 -- EXPRESSION
 ---------------------------------------
 
-exp :: Parser Exp
-exp = int_exp
+uexp :: Parser Exp
+uexp = int_exp
   <|> float_exp
   <|> try acc_dot_exp
   <|> try acc_arr_exp
@@ -175,12 +183,12 @@ exp = int_exp
 int_exp :: Parser Exp
 int_exp = do
   i <- integer
-  return $ Integer i
+  return $ Integer_L i
 
 float_exp :: Parser Exp
 float_exp = do
   f <- float
-  return $ Float f
+  return $ Float_L f
 
 acc_dot_exp :: Parser Exp
 acc_dot_exp = do
@@ -199,7 +207,7 @@ acc_arr_exp = do
 cast_exp :: Parser Exp
 cast_exp = do
   t <- angles ptype
-  e <- parens exp
+  e <- parens uexp
   return $ Cast_Exp t e
 
 id_exp :: Parser Exp
@@ -210,12 +218,12 @@ id_exp = do
 ref_exp :: Parser Exp
 ref_exp = do
   reserved_op "*"
-  e <- exp
+  e <- uexp
   return $ Ref_Exp e
 
 deref_exp :: Parser Exp
 deref_exp = do
   reserved_op "&"
-  e <- exp
+  e <- uexp
   return $ Deref_Exp e
 
